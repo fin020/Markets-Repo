@@ -26,6 +26,11 @@ inflation = inflation.sort_values(by='Time')
 inflation = inflation.set_index('Time')
 inflation = inflation.groupby('Country')['Inflation rate (%)'].resample('Y').mean().reset_index()
 
+
+inflation_rate = inflation.copy()
+inflation_rate['Inflation rate (%)'] = inflation.groupby("Country")['Inflation rate (%)'].pct_change() * 100
+
+
 print(inflation.groupby('Country').describe())
 
 # Create professional figure
@@ -40,7 +45,7 @@ colors = {
 }
 
 # Plot each country
-for country, group in inflation.groupby('Country'):
+for country, group in inflation_rate.groupby('Country'):
     ax.plot(group['Time'], group['Inflation rate (%)'], 
             label=country,
             color=colors.get(country, '#333333'),
@@ -50,7 +55,7 @@ for country, group in inflation.groupby('Country'):
             alpha=0.9)
 
 # Styling & labels
-ax.set_title('Inflation Trends: Key Global Economies (CPI, % YoY)', 
+ax.set_title('Inflation Trends: Key Global Economies (CPI, %)', 
              fontsize=16, fontweight='bold', pad=20)
 ax.set_xlabel('Year', fontsize=12, fontweight='semibold')
 ax.set_ylabel('Inflation Rate (%)', fontsize=12, fontweight='semibold')
